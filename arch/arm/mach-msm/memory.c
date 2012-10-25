@@ -1,7 +1,7 @@
 /* arch/arm/mach-msm/memory.c
  *
  * Copyright (C) 2007 Google, Inc.
- * Copyright (c) 2009-2010, Code Aurora Forum. All rights reserved.
+ * Copyright (c) 2009-2011, Code Aurora Forum. All rights reserved.
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -17,11 +17,13 @@
 #include <linux/mm.h>
 #include <linux/mm_types.h>
 #include <linux/bootmem.h>
+#include <linux/memory_alloc.h>
 #include <linux/module.h>
 #include <asm/pgtable.h>
 #include <asm/io.h>
 #include <asm/mach/map.h>
 #include <asm/cacheflush.h>
+#include <mach/msm_memtypes.h>
 #include <linux/hardirq.h>
 #if defined(CONFIG_MSM_NPA_REMOTE)
 #include "npa_remote.h"
@@ -54,7 +56,7 @@ void *strongly_ordered_page;
  */
 void map_page_strongly_ordered(void)
 {
-#if defined(CONFIG_ARCH_MSM7X27)
+#if defined(CONFIG_ARCH_MSM7X27) && !defined(CONFIG_ARCH_MSM7X27A)
 	long unsigned int phys;
 
 	if (strongly_ordered_page)
@@ -72,7 +74,7 @@ EXPORT_SYMBOL(map_page_strongly_ordered);
 
 void write_to_strongly_ordered_memory(void)
 {
-#if defined(CONFIG_ARCH_MSM7X27)
+#if defined(CONFIG_ARCH_MSM7X27) && !defined(CONFIG_ARCH_MSM7X27A)
 	if (!strongly_ordered_page) {
 		if (!in_interrupt())
 			map_page_strongly_ordered();
@@ -90,7 +92,7 @@ EXPORT_SYMBOL(write_to_strongly_ordered_memory);
 
 void flush_axi_bus_buffer(void)
 {
-#if defined(CONFIG_ARCH_MSM7X27)
+#if defined(CONFIG_ARCH_MSM7X27) && !defined(CONFIG_ARCH_MSM7X27A)
 	__asm__ __volatile__ ("mcr p15, 0, %0, c7, c10, 5" \
 				    : : "r" (0) : "memory");
 	write_to_strongly_ordered_memory();
@@ -150,7 +152,12 @@ void invalidate_caches(unsigned long vstart,
 
 	flush_axi_bus_buffer();
 }
-
+unsigned long allocate_contiguous_ebi_nomap(unsigned long size,unsigned long align)
+{
+  return _allocate_contiguous_memory_nomap(size, MEMTYPE_EBI0,
+    align, __builtin_return_address(0));
+}
+EXPORT_SYMBOL(allocate_contiguous_ebi_nomap);
 void *alloc_bootmem_aligned(unsigned long size, unsigned long alignment)
 {
 	void *unused_addr = NULL;
