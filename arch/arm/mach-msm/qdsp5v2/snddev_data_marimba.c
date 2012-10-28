@@ -77,9 +77,9 @@ static struct snddev_icodec_data snddev_iearpiece_data = {
 	.pamp_off = NULL,
 	.property = SIDE_TONE_MASK,
 	.max_voice_rx_vol[VOC_NB_INDEX] = -200,
-	.min_voice_rx_vol[VOC_NB_INDEX] = -1700,
+	.min_voice_rx_vol[VOC_NB_INDEX] = -2200,
 	.max_voice_rx_vol[VOC_WB_INDEX] = -200,
-	.min_voice_rx_vol[VOC_WB_INDEX] = -1700
+	.min_voice_rx_vol[VOC_WB_INDEX] = -2200
 };
 
 static struct platform_device msm_iearpiece_device = {
@@ -121,9 +121,9 @@ static struct snddev_icodec_data snddev_ihac_rx_data = {
 	.pamp_off = NULL,
 	.property = SIDE_TONE_MASK,
 	.max_voice_rx_vol[VOC_NB_INDEX] = -200,
-	.min_voice_rx_vol[VOC_NB_INDEX] = -1700,
+	.min_voice_rx_vol[VOC_NB_INDEX] = -2200,
 	.max_voice_rx_vol[VOC_WB_INDEX] = -200,
-	.min_voice_rx_vol[VOC_WB_INDEX] = -1700
+	.min_voice_rx_vol[VOC_WB_INDEX] = -2200
 };
 
 static struct platform_device msm_ihac_rx_device = {

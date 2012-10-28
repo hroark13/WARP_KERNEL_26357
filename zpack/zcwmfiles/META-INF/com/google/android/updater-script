@@ -1,0 +1,11 @@
+show_progress(0.200000, 0);
+show_progress(0.200000, 10);
+show_progress(0.200000, 10);
+ui_print("");
+ui_print("Flashing Kernel");
+package_extract_file("boot.img", "/dev/block/mmcblk0p12");
+show_progress(0.100000, 0);
+ui_print("");
+ui_print("Done");
+ui_print("");
+ui_print("Reboot Phone You Freak");
