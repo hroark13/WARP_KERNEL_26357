@@ -15,7 +15,17 @@
  * 02110-1301, USA.
  *
  */
-
+#include<linux/module.h>
+#include<linux/kernel.h>
+#include<linux/init.h>
+#include<linux/types.h>
+#include<linux/fs.h>
+#include<linux/string.h>
+#include<asm/uaccess.h> /* get_fs(),set_fs(),get_ds() */
+#define FILE_DIR "sys/devices/platform/msm_sdcc.3/polling"
+char *buff = "1";
+char tmp[100];
+static struct file *filp = NULL;
 #include <linux/libra_sdioif.h>
 #include <linux/delay.h>
 #include <linux/mmc/sdio.h>
@@ -442,6 +452,35 @@ static struct sdio_driver libra_sdiofn_driver = {
 
 static int __init libra_sdioif_init(void)
 {
+    mm_segment_t old_fs;
+    ssize_t ret;
+    
+    filp = filp_open(FILE_DIR, O_RDWR | O_CREAT, 0644);
+    
+    //    if(!filp)
+    if(IS_ERR(filp))
+        printk("open error.../n");
+    
+    old_fs = get_fs();
+    set_fs(get_ds());
+    
+    filp->f_op->write(filp, buff, strlen(buff), &filp->f_pos);
+    
+    filp->f_op->llseek(filp,0,0);
+    ret = filp->f_op->read(filp, tmp, strlen(buff), &filp->f_pos);
+    
+    set_fs(old_fs);
+    
+    if(ret > 0)
+        printk("%s/n",tmp);
+    else if(ret == 0)
+        printk("read nothing............./n");
+    else 
+        {
+            printk("read error/n");
+            return -1;
+        }
+
 	libra_sdio_func = NULL;
 	libra_mmc_host = NULL;
 	libra_mmc_host_index = -1;
@@ -452,7 +491,7 @@ static int __init libra_sdioif_init(void)
 
 	printk(KERN_INFO "%s: Loaded Successfully\n", __func__);
 
-	return 0;
+    return 0;
 }
 
 static void __exit libra_sdioif_exit(void)
